@@ -11,9 +11,10 @@ function Square({value,onSquareClick}) {
 export default function Board() {
   const [XisNext,setXIsNext] = useState(true);
   const [squares,setSquares] = useState(Array(9).fill(null));
+  
 
   function handleClick (i){
-    if (squares(i)){
+    if (squares[i] || calculateWinner(squares)){
       return; //faire un retour si la case est déja occupé
     }
     const nextSquares = squares.slice();
@@ -25,9 +26,26 @@ export default function Board() {
     setSquares(nextSquares);
     setXIsNext(!XisNext);
   }
+
+  const winner = calculateWinner(squares);
+
+  let status;
+  if (winner) {
+    status = winner + " a gagné";
+  } else {
+    status = "Prochain tour : " + (XisNext ? "X" : "O");
+  }
+
+  function handleRestart() {
+    setSquares(Array(9).fill(null));
+    setXIsNext(true);
+  }
+
   return (
     <>
-
+     <h1 className='title'>TIC-TAC-TOE GAME !</h1>
+    <div className='status'>{status}</div>
+    <button className='restart' onClick={handleRestart}>Revenir au début</button>
     <div className='container'>
     <div className='tab'>
         <Square value={squares[0]} onSquareClick={() => handleClick(0)} />
@@ -50,4 +68,24 @@ export default function Board() {
 
     </>
   ) 
+}
+
+function calculateWinner(squares) {
+  const lines = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6]
+  ];
+  for (let i = 0; i < lines.length; i++) {
+    const [a, b, c] = lines[i];
+    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+      return squares[a];
+    }
+  }
+  return null;
 }
